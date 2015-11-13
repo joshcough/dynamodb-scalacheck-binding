@@ -15,6 +15,15 @@ object Diff {
     new Diff(t._1, t._2, diffs)
 }
 
+/**
+  *
+  * @param oldValues The original record
+  * @param newValues The new record with potentially updated
+  *                  values from oldValues
+  * @param diffs
+  * @tparam K
+  * @tparam V
+  */
 case class Diff[K,V](oldValues: Map[K,V],
                      newValues: Map[K,V],
                      diffs: Set[Update[K,V]])
