@@ -1,6 +1,10 @@
 name    := "dynamodb-scalacheck-binding"
 
-version := "1.0-SNAPSHOT"
+version := "1.0"
+
+organization := "com.localytics"
+
+scalaVersion := "2.11.7"
 
 // Like a Boss.
 initialCommands in console := "import scalaz._, Scalaz._"
