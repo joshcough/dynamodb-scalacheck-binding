@@ -10,6 +10,8 @@ abstract class BaseProperties(name: String) extends Properties(name) {
     ()
   }
 
+  // TODO: this was in use in profiles, but since i moved this out of there
+  // i now need tests for arbitrary diffs. then this function would be used.
   def resize[T](maxSize: Int = 75, reduceFactor: Int = 2)(g:Gen[T]): Gen[T] =
     Gen.sized { size =>
       if(size < maxSize) g

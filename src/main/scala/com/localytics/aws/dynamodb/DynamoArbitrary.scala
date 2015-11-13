@@ -2,6 +2,7 @@ package com.localytics.aws.dynamodb
 
 import com.amazonaws.services.dynamodbv2.model.{AttributeValue, StreamRecord}
 import com.amazonaws.services.lambda.runtime.events.DynamodbEvent.DynamodbStreamRecord
+import com.localytics.aws.dynamodb.updates.{DiffArbitrary, Unmodified, Update, Diff}
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Gen._
 import org.scalacheck._
