@@ -1,7 +1,6 @@
 package com.localytics.aws.dynamodb
 
 import com.amazonaws.services.dynamodbv2.model.{AttributeValue, StreamRecord}
-import com.amazonaws.services.lambda.runtime.events.DynamodbEvent.DynamodbStreamRecord
 import com.localytics.aws.dynamodb.updates.{DiffArbitrary, Unmodified, Update, Diff}
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Gen._
@@ -53,7 +52,7 @@ object DynamoArbitrary {
    * paired with the diffs made to create it the new image.
    */
   implicit def arbStreamRecord[K](implicit arb: Arbitrary[K], s: Show[K]):
-    Arbitrary[(DynamodbStreamRecord, Set[Update[K, AttributeValue]])] =
+    Arbitrary[(StreamRecord, Set[Update[K, AttributeValue]])] =
       Arbitrary(arbDynamoDiff[K].arbitrary.map(d => (d.rec, d.diff.diffs)))
 
   /**
@@ -73,16 +72,14 @@ object DynamoArbitrary {
    */
   def makeStreamRecord[K]
     (oldImage: Record[K], newImage: Record[K], seqNum: Int)
-    (implicit show: Show[K]): DynamodbStreamRecord = {
+    (implicit show: Show[K]): StreamRecord = {
     def toJava(m: Map[K, AttributeValue]): JDynamoRecord =
       m.map{ case (f,v) => (f.toString, v) }.asJava
-    new DynamodbStreamRecord() {
-      override def getDynamodb: StreamRecord = new StreamRecord {}
+    new StreamRecord {}
         .withOldImage(toJava(oldImage))
         .withNewImage(toJava(newImage))
         .withSequenceNumber(seqNum.toString)
     }
-  }
 
   object DynamoDiff {
     def apply[K](diff: Diff[K, AttributeValue],
@@ -93,15 +90,13 @@ object DynamoArbitrary {
       )
   }
 
-  case class DynamoDiff[K](rec: DynamodbStreamRecord,
-                           diff: Diff[K, AttributeValue]) {
+  case class DynamoDiff[K](rec: StreamRecord, diff: Diff[K, AttributeValue]) {
 
     override def toString: String = diff.toString
 
-    def dynamo: StreamRecord = rec.getDynamodb
-    def seq: Int = dynamo.getSequenceNumber.toInt
-    def oldValues: DynamoRecord = dynamo.getOldImage.asScala.toMap
-    def newValues: DynamoRecord = dynamo.getNewImage.asScala.toMap
+    def seq: Int = rec.getSequenceNumber.toInt
+    def oldValues: DynamoRecord = rec.getOldImage.asScala.toMap
+    def newValues: DynamoRecord = rec.getNewImage.asScala.toMap
 
     /**
      * Add the given key->val pair to
